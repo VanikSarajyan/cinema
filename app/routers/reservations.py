@@ -5,7 +5,7 @@ from app.security import get_current_user, redirect_to_login
 reservations_router = APIRouter(prefix="/reservations", tags=["Reservations"])
 
 
-@reservations_router.get("/")
+@reservations_router.get("/reservations-page")
 async def reservations(request: Request):
 
     try:

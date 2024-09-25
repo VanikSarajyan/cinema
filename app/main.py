@@ -28,7 +28,7 @@ app.add_middleware(
 
 @app.get("/")
 def main(request: Request):
-    return RedirectResponse(url="/reservations", status_code=status.HTTP_302_FOUND)
+    return RedirectResponse(url="/reservations/reservations-page", status_code=status.HTTP_302_FOUND)
 
 
 app.include_router(movies_router)

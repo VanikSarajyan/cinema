@@ -26,7 +26,7 @@ if (loginForm) {
                 logout();
                 // Save token to cookie
                 document.cookie = `access_token=${data.access_token}; path=/`;
-                window.location.href = '/reservations'; // Change this to your desired redirect page
+                window.location.href = '/reservations/reservations-page';
             } else {
                 const errorData = await response.json();
                 alert(`Error: ${errorData.detail}`);
@@ -64,11 +64,14 @@ if (registerForm) {
             });
 
             if (response.ok) {
-                window.location.href = '/reservations';
+                const data = await response.json();
+                logout();
+                document.cookie = `access_token=${data.access_token}; path=/`;
+                window.location.href = '/reservations/reservations-page';
             } else {
                 const errorData = await response.json();
                 console.log(errorData)
-                alert(`Error: ${errorData.message}`);
+                alert(`Error: ${errorData.detail}`);
             }
         } catch (error) {
             console.error('Error:', error);
