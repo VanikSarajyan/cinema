@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Enum
+from sqlalchemy import Column, Integer, String, Enum, Text, Boolean
 from app.database import Base
 import enum
 
@@ -16,3 +16,13 @@ class User(Base):
     username = Column(String, unique=True, nullable=False)
     hashed_password = Column(String)
     role = Column(Enum(UserRole), default=UserRole.regular.value)
+
+
+class Movie(Base):
+    __tablename__ = "movies"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    poster = Column(String, nullable=False)
+    description = Column(Text, nullable=True)
+    active = Column(Boolean, nullable=False, default=True)

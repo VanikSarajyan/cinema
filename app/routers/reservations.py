@@ -6,10 +6,9 @@ reservations_router = APIRouter(prefix="/reservations", tags=["Reservations"])
 
 
 @reservations_router.get("/reservations-page")
-async def reservations(request: Request):
-
+def reservations(request: Request):
     try:
-        user = await get_current_user(request.cookies.get("access_token"))
+        user = get_current_user(request.cookies.get("access_token"))
 
         if user is None:
             return redirect_to_login()

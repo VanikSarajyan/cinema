@@ -25,8 +25,7 @@ def upgrade() -> None:
         f"""
         INSERT INTO users (id, username, email, hashed_password, role) VALUES
         (1, 'admin', 'admin@example.com', '{get_password_hash("admin")}', 'admin'),
-        (2, 'user1', 'user1@example.com', '{get_password_hash("user1")}', 'regular'),
-        (3, 'user2', 'user2@example.com', '{get_password_hash("user2")}', 'regular')
+        (2, 'user', 'user@example.com', '{get_password_hash("user")}', 'regular')
     """
     )
 

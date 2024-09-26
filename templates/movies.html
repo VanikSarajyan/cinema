@@ -1,0 +1,44 @@
+{% include 'layout.html' %}
+
+<div class="container">
+    <div class="container mt-5">
+        <h1 class="mb-4">Movies</h1>
+
+        {% if user.role == 'admin' %}
+        <div class="mb-3">
+            <a href="/movies/movie-create" class="btn btn-primary">Create Movie</a>
+        </div>
+        {% endif %}
+
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Poster</th>
+                    <th>Description</th>
+                    {% if user.role == 'admin' %}
+                    <th>Actions</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for movie in movies %}
+                <tr>
+                    <td>{{ movie.id }}</td>
+                    <td>{{ movie.name }}</td>
+                    <td><img src="{{ movie.poster }}" alt="{{ movie.name }}" style="width: 50px; height: auto;">
+                    </td>
+                    <td>{{ movie.description or 'N/A' }}</td>
+                    {% if user.role == 'admin' %}
+                    <td>
+                        <a href="/movies/{{ movie.id }}/edit" class="btn btn-sm btn-warning">Edit</a>
+                        <button data-movie-id="{{ movie.id }}" class="deleteMovie btn btn-sm btn-danger">Delete</a>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>

@@ -1,0 +1,34 @@
+{% include 'layout.html' %}
+
+<div class="container">
+    <div class="container mt-5">
+        <h1>Create New Movie</h1>
+
+        <form id="movieCreateForm">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="poster">Poster URL</label>
+                <input type="text" class="form-control" id="poster" name="poster" required>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea class="form-control" id="description" name="description"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="active">Status</label>
+                <select class="form-control" id="active" name="active">
+                    <option value="True">Active</option>
+                    <option value="False">Inactive</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-success">Create Movie</button>
+        </form>
+    </div>
+</div>
