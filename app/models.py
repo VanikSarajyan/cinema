@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Enum, Text, Boolean
+from sqlalchemy import Column, Integer, String, Enum, Text, Boolean, ForeignKey
+from sqlalchemy.orm import relationship
 from app.database import Base
 import enum
 
@@ -39,3 +40,15 @@ class Room(Base):
     @property
     def seats(self):
         return self.rows * self.columns
+
+
+class Seat(Base):
+    __tablename__ = "seats"
+
+    id = Column(Integer, primary_key=True, index=True)
+    room_id = Column(Integer, ForeignKey("rooms.id", ondelete="CASCADE"))
+    row_number = Column(Integer, nullable=False)
+    column_number = Column(Integer, nullable=False)
+    is_vip = Column(Boolean, default=False)
+
+    room = relationship(Room, back_populates="seats")
