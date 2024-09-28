@@ -1,8 +1,10 @@
 from typing import Annotated
 from fastapi import APIRouter, Request, Depends
+
 from app.template import templates
-from app.security import get_current_user_cookie, redirect_to_login
+from app.security import get_current_user_cookie
 from app.models import User
+from app.utils import redirect_to_login
 
 reservations_router = APIRouter(prefix="/reservations", tags=["Reservations"])
 

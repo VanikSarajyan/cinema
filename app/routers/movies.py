@@ -1,34 +1,25 @@
+from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, Request
 from starlette import status
-from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
+
 from app.database import get_db
+from app.exceptions import MovieNotFoundException
 from app.models import Movie, UserRole, User
-from app.security import get_current_user_cookie, redirect_to_login, redirect_to
+from app.security import get_current_user_cookie
+from app.services import MovieService
+from app.schemas import MovieCreate, MovieUpdate
 from app.template import templates
-from typing import Annotated
+from app.utils import redirect_to_login
+
 
 movies_router = APIRouter(prefix="/movies", tags=["Movies"])
 
 
-class MovieBase(BaseModel):
-    name: str = Field(..., min_length=1)
-    poster: str = Field(..., min_length=1)
-    description: str | None = None
-    duration: int = Field(default=120)
-
-
-class MovieCreate(MovieBase):
-    active: bool = True
-
-
-class MovieUpdate(MovieBase):
-    active: bool = True
-
-
 @movies_router.get("/")
 def get_movies(db: Session = Depends(get_db)):
-    return db.query(Movie).filter(Movie.active).all()
+    movie_servie = MovieService(db)
+    return movie_servie.get_movies()
 
 
 @movies_router.get("/movies-page")
@@ -38,7 +29,8 @@ def render_movies_page(
     if user is None:
         return redirect_to_login()
 
-    movies = db.query(Movie).all()
+    movie_servie = MovieService(db)
+    movies = movie_servie.get_movies(only_actives=user.role != UserRole.admin)
     return templates.TemplateResponse("movies.html", {"request": request, "movies": movies, "user": user})
 
 
@@ -63,7 +55,8 @@ def edit_movie(
     if user.role != UserRole.admin.value:
         raise HTTPException(status_code=403, detail="Not authorized")
 
-    movie = db.query(Movie).filter(Movie.id == movie_id).first()
+    movie_servie = MovieService(db)
+    movie = movie_servie.get_movie_by_id(movie_id)
     if not movie:
         raise HTTPException(status_code=404, detail="Movie not found")
 
@@ -78,11 +71,10 @@ def create_movie(
 ):
     if user.role != UserRole.admin.value:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized action")
-    new_movie = Movie(**movie.model_dump())
-    db.add(new_movie)
-    db.commit()
-    db.refresh(new_movie)
-    return new_movie
+
+    movie_servie = MovieService(db)
+
+    return movie_servie.create_new_movie(movie)
 
 
 @movies_router.put("/{movie_id}")
@@ -95,17 +87,12 @@ def update_movie(
     if user.role != UserRole.admin.value:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized action")
 
-    db_movie = db.query(Movie).filter(Movie.id == movie_id).first()
+    movie_servie = MovieService(db)
 
-    if not db_movie:
+    try:
+        return movie_servie.update_movie(movie_id, movie)
+    except MovieNotFoundException:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Movie not found")
-
-    for key, value in movie.model_dump(exclude_unset=True).items():
-        setattr(db_movie, key, value)
-
-    db.commit()
-    db.refresh(db_movie)
-    return db_movie
 
 
 @movies_router.delete("/{movie_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -116,11 +103,10 @@ def delete_movie(
 ):
     if user.role != UserRole.admin.value:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Unauthorized action")
-    db_movie = db.query(Movie).filter(Movie.id == movie_id).first()
 
-    if not db_movie:
+    movie_servie = MovieService(db)
+
+    try:
+        return movie_servie.delete_movie(movie_id)
+    except MovieNotFoundException:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Movie not found")
-
-    db.delete(db_movie)
-    db.commit()
-    return None

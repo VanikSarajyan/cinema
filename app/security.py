@@ -3,13 +3,12 @@ from passlib.context import CryptContext
 from jose import JWTError, jwt
 from fastapi import HTTPException, Depends, Request
 from fastapi.security import OAuth2PasswordBearer
-from fastapi.responses import RedirectResponse
 from starlette import status
 from typing import Annotated
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import User
-from app.exceptions import INVALID_CREDENTIALS
+
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_bearer = OAuth2PasswordBearer(tokenUrl="users/login")
@@ -27,7 +26,12 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def create_access_token(username: str, user_id: int, role: str, expires_minutes: int = ACCESS_TOKEN_EXPIRE_MINUTES):
+def create_access_token(
+    username: str,
+    user_id: int,
+    role: str,
+    expires_minutes: int = ACCESS_TOKEN_EXPIRE_MINUTES,
+) -> str:
     encode = {"sub": username, "id": user_id, "role": role}
     expires = datetime.now(timezone.utc) + timedelta(minutes=expires_minutes)
     encode.update({"exp": expires})
@@ -53,7 +57,7 @@ def get_current_user_cookie(request: Request, db: Annotated[Session, Depends(get
     token = request.cookies.get("access_token")
 
     if not token:
-        return redirect_to("/users/login")
+        return None
 
     token = token.replace("Bearer ", "")
 
@@ -61,17 +65,7 @@ def get_current_user_cookie(request: Request, db: Annotated[Session, Depends(get
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
-            return redirect_to("/users/login")
+            return None
         return db.query(User).filter_by(username=username).first()
     except JWTError:
-        return redirect_to("/users/login")
-
-
-def redirect_to(path: str):
-    return RedirectResponse(url=path, status_code=status.HTTP_302_FOUND)
-
-
-def redirect_to_login():
-    redirect_response = redirect_to("/users/login")
-    redirect_response.delete_cookie(key="access_token")
-    return redirect_response
+        return None
