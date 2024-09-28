@@ -15,6 +15,7 @@ class MovieBase(BaseModel):
     name: str = Field(..., min_length=1)
     poster: str = Field(..., min_length=1)
     description: str | None = None
+    duration: int = Field(default=120)
 
 
 class MovieCreate(MovieBase):
@@ -99,7 +100,7 @@ def update_movie(
     if not db_movie:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Movie not found")
 
-    for key, value in movie.dict(exclude_unset=True).items():
+    for key, value in movie.model_dump(exclude_unset=True).items():
         setattr(db_movie, key, value)
 
     db.commit()
@@ -109,7 +110,6 @@ def update_movie(
 
 @movies_router.delete("/{movie_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_movie(
-    request: Request,
     movie_id: int,
     db: Annotated[Session, Depends(get_db)],
     user: Annotated[User, Depends(get_current_user_cookie)],

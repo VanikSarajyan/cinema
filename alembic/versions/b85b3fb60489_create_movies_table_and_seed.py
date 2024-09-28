@@ -27,6 +27,7 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer, primary_key=True),
         sa.Column("name", sa.String, unique=True, nullable=False),
         sa.Column("poster", sa.String, nullable=False),
+        sa.Column("duration", sa.Integer, default=120),
         sa.Column("description", sa.Text, nullable=True),
         sa.Column("active", sa.Boolean, nullable=False, default=True),
         if_not_exists=True,
@@ -34,11 +35,11 @@ def upgrade() -> None:
 
     op.execute(
         f"""
-        INSERT INTO movies (id, name, poster, description, active) VALUES
-        (1, 'Movie 1', '{MOVIE_URL}', 'description 1', TRUE),
-        (2, 'Movie 2', '{MOVIE_URL}', 'description 2', TRUE),
-        (3, 'Movie 3', '{MOVIE_URL}', 'description 3', TRUE),
-        (4, 'Movie 4', '{MOVIE_URL}', 'description 4', TRUE)
+        INSERT INTO movies (id, name, poster, duration, description, active) VALUES
+        (1, 'Movie 1', '{MOVIE_URL}', 90, 'description 1', TRUE),
+        (2, 'Movie 2', '{MOVIE_URL}', 120,'description 2', TRUE),
+        (3, 'Movie 3', '{MOVIE_URL}', 85,'description 3', TRUE),
+        (4, 'Movie 4', '{MOVIE_URL}', 102,'description 4', TRUE)
     """
     )
 

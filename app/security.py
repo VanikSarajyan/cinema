@@ -51,8 +51,9 @@ def get_current_user_header(
 
 def get_current_user_cookie(request: Request, db: Annotated[Session, Depends(get_db)]) -> User | None:
     token = request.cookies.get("access_token")
+
     if not token:
-        raise INVALID_CREDENTIALS
+        return redirect_to("/users/login")
 
     token = token.replace("Bearer ", "")
 
@@ -60,10 +61,10 @@ def get_current_user_cookie(request: Request, db: Annotated[Session, Depends(get
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
-            raise INVALID_CREDENTIALS
+            return redirect_to("/users/login")
         return db.query(User).filter_by(username=username).first()
     except JWTError:
-        raise INVALID_CREDENTIALS
+        return redirect_to("/users/login")
 
 
 def redirect_to(path: str):
