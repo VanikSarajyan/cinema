@@ -1,11 +1,15 @@
 from datetime import datetime, timedelta, timezone
 from passlib.context import CryptContext
 from jose import JWTError, jwt
-from fastapi import HTTPException, Depends
+from fastapi import HTTPException, Depends, Request
 from fastapi.security import OAuth2PasswordBearer
 from fastapi.responses import RedirectResponse
 from starlette import status
 from typing import Annotated
+from sqlalchemy.orm import Session
+from app.database import get_db
+from app.models import User
+from app.exceptions import INVALID_CREDENTIALS
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_bearer = OAuth2PasswordBearer(tokenUrl="users/login")
@@ -30,24 +34,43 @@ def create_access_token(username: str, user_id: int, role: str, expires_minutes:
     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
-def get_current_user(token: Annotated[str, Depends(oauth2_bearer)]):
+def get_current_user_header(
+    token: Annotated[str, Depends(oauth2_bearer)],
+    db: Annotated[Session, Depends(get_db)],
+) -> User | None:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
         user_id: int = payload.get("id")
-        user_role: str = payload.get("role")
-        if username is None or user_id is None:
+
+        if user_id is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user.")
-        return {"username": username, "id": user_id, "role": user_role}
+        return db.query(User).get(user_id)
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user.")
 
 
-def redirect_to_login():
-    redirect_response = RedirectResponse(url="/users/login-page", status_code=status.HTTP_302_FOUND)
-    redirect_response.delete_cookie(key="access_token")
-    return redirect_response
+def get_current_user_cookie(request: Request, db: Annotated[Session, Depends(get_db)]) -> User | None:
+    token = request.cookies.get("access_token")
+    if not token:
+        raise INVALID_CREDENTIALS
+
+    token = token.replace("Bearer ", "")
+
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise INVALID_CREDENTIALS
+        return db.query(User).filter_by(username=username).first()
+    except JWTError:
+        raise INVALID_CREDENTIALS
 
 
 def redirect_to(path: str):
     return RedirectResponse(url=path, status_code=status.HTTP_302_FOUND)
+
+
+def redirect_to_login():
+    redirect_response = redirect_to("/users/login")
+    redirect_response.delete_cookie(key="access_token")
+    return redirect_response

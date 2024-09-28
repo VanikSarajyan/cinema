@@ -25,7 +25,7 @@ def upgrade() -> None:
     op.create_table(
         "movies",
         sa.Column("id", sa.Integer, primary_key=True),
-        sa.Column("name", sa.String, nullable=False),
+        sa.Column("name", sa.String, unique=True, nullable=False),
         sa.Column("poster", sa.String, nullable=False),
         sa.Column("description", sa.Text, nullable=True),
         sa.Column("active", sa.Boolean, nullable=False, default=True),

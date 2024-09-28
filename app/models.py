@@ -3,7 +3,7 @@ from app.database import Base
 import enum
 
 
-class UserRole(enum.Enum):
+class UserRole(enum.StrEnum):
     admin = "admin"
     regular = "regular"
 
@@ -22,7 +22,20 @@ class Movie(Base):
     __tablename__ = "movies"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
+    name = Column(String, nullable=False, unique=True)
     poster = Column(String, nullable=False)
     description = Column(Text, nullable=True)
     active = Column(Boolean, nullable=False, default=True)
+
+
+class Room(Base):
+    __tablename__ = "rooms"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    rows = Column(Integer, nullable=False)
+    columns = Column(Integer, nullable=False)
+
+    @property
+    def seats(self):
+        return self.rows * self.columns

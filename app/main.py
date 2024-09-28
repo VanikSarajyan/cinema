@@ -4,14 +4,9 @@ from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from starlette import status
 
-from app.database import engine
-from app.models import Base
-from app.routers import movies_router, users_router, reservations_router
+from app.routers import movies_router, users_router, reservations_router, rooms_router
 from app.template import templates
 
-
-# Create tables
-# Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -34,8 +29,15 @@ def main(request: Request):
 app.include_router(movies_router)
 app.include_router(users_router)
 app.include_router(reservations_router)
+app.include_router(rooms_router)
 
 
 @app.exception_handler(404)
 async def custom_404_handler(request, _):
     return templates.TemplateResponse("404.html", {"request": request})
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run("app.main:app", host="0.0.0.0", port=80, reload=True)

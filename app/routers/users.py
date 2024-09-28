@@ -28,6 +28,10 @@ def get_user_by_email(db: Session, email: str):
     return db.query(User).filter(User.email == email).first()
 
 
+def get_user_by_username(db: Session, username: str):
+    return db.query(User).filter(User.username == username).first()
+
+
 def authenticate_user(username: str, password: str, db):
     user = db.query(User).filter(User.username == username).first()
     if not user:
@@ -43,7 +47,7 @@ def render_login_page(request: Request):
 
 
 @users_router.post("/login", response_model=Token)
-async def login_for_access_token(
+def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Annotated[Session, Depends(get_db)]
 ):
     user = authenticate_user(form_data.username, form_data.password, db)
@@ -51,7 +55,7 @@ async def login_for_access_token(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user.")
     token = create_access_token(user.username, user.id, user.role.value)
 
-    return {"access_token": token, "token_type": "bearer"}
+    return Token(access_token=token, token_type="bearer")
 
 
 @users_router.get("/register-page")
@@ -60,10 +64,10 @@ def render_register_page(request: Request):
 
 
 @users_router.post("/register", response_model=Token)
-def register(user_data: UserRegister, db: Session = Depends(get_db)):
-    user = get_user_by_email(db, user_data.email)
+def register(user_data: UserRegister, db: Annotated[Session, Depends(get_db)]):
+    user = get_user_by_email(db, user_data.email) or get_user_by_username(db, user_data.username)
     if user:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise HTTPException(status_code=400, detail="User already registered")
 
     if user_data.password != user_data.verify_password:
         raise HTTPException(status_code=400, detail="Password mismatch")
@@ -75,4 +79,4 @@ def register(user_data: UserRegister, db: Session = Depends(get_db)):
     db.refresh(new_user)
 
     access_token = create_access_token(new_user.username, new_user.id, new_user.role.value)
-    return {"access_token": access_token, "token_type": "bearer"}
+    return Token(access_token=access_token, token_type="bearer")
