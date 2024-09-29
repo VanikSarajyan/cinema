@@ -41,3 +41,24 @@ Navigate to project root directory and run
 ```
 
 ## After setup open your browser at http://localhost:80/
+
+
+# Project Improvements:
+
+### Project Improvements:
+
+- Ensure all resources have complete CRUD functionality.
+- Implement comprehensive testing and CI pipeline:
+  - Add unit and integration tests.
+  - Incorporate linting and code formatting tools (e.g., `flake8`, `black`, `isort`).
+- Improve naming conventions and enforce code style consistency across the project.
+- Enhance the user interface (UI) to make it more comprehensive and intuitive for end-users.
+- Replace hardcoded values with configuration files and environment variables for:
+  - API keys
+  - Database URLs
+  - Other sensitive settings and configurable variables
+- Transition to a production-grade database for better scalability and performance.
+- Implement stricter data validation and business logic validation across the system.
+- Support non-rectangular room designs to allow more flexible seat arrangements.
+- Ensure design consistency by using a service layer for all internal logic.
+- Use [Poetry](https://python-poetry.org/) for better dependency management and packaging.
