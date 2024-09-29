@@ -34,3 +34,8 @@ class ScheduleCreate(BaseModel):
     room_id: int
     start_time: datetime
     end_time: datetime
+
+
+class ReservationCreate(BaseModel):
+    seat_id: int
+    schedule_id: int

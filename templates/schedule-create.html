@@ -8,7 +8,8 @@
             <select class="form-control" id="movie_id" name="movie_id" required>
                 <option value="">Select a movie</option>
                 {% for movie in movies %}
-                <option value="{{ movie.id }}">{{ movie.name }} ({{ movie.duration }} minutes )</option>
+                <option value="{{ movie.id }}" data-duration="{{ movie.duration }}">{{ movie.name }} ({{ movie.duration
+                    }} minutes )</option>
                 {% endfor %}
             </select>
         </div>
@@ -33,6 +34,6 @@
             <input type="datetime-local" class="form-control" id="end_time" name="end_time" required>
         </div>
 
-        <button type="submit" class="btn btn-primary">Create Schedule</button>
+        <button type="submit" class="btn btn-success">Create Schedule</button>
     </form>
 </div>

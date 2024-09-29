@@ -1,0 +1,47 @@
+{% include 'layout.html' %}
+
+<div class="container mt-5">
+    <h2 class="mb-4">Reserve a Seat for <strong>{{ movie.name }}</strong></h2>
+    <p><strong>Room:</strong> {{ room.name }}</p>
+    <p><strong>Schedule:</strong> {{ schedule.start_time }} - {{ schedule.end_time }}</p>
+
+    <div class="seat-grid">
+        <div class="seats-container" style="grid-template-columns: repeat({{ room.columns }}, 1fr);">
+            <!-- Loop through all seats -->
+            {% for seat_data in seats_with_status %}
+            <div class="seat">
+                <button class="btn reserve-btn
+                    {% if seat_data.reserved %} btn-danger {% else %} btn-success {% endif %} 
+                    seat-btn" {% if not seat_data.reserved %} data-seat-id="{{ seat_data.seat.id }}"
+                    data-schedule-id="{{ schedule.id }}" {% else %} disabled {% endif %}>
+                    {{ seat_data.seat.row_number }}-{{ seat_data.seat.column_number }}
+                </button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .seat-grid {
+        margin-top: 20px;
+    }
+
+    .seats-container {
+        display: grid;
+        grid-gap: 10px;
+        justify-content: center;
+    }
+
+    .seat {
+        text-align: center;
+    }
+
+    .seat-btn {
+        width: 60px;
+        height: 60px;
+        text-align: center;
+        line-height: 60px;
+        font-size: 12px;
+    }
+</style>

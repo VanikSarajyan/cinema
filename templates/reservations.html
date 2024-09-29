@@ -1,11 +1,37 @@
 {% include 'layout.html' %}
 
-
 <div class="container">
-    <div class="card">
-        <h1>
-            Welcome to Cinema App!
-        </h1>
-        <h2>Here you can see your reservations</h2>
+    <div class="container mt-5">
+        <h1 class="mb-4">Your Reservations</h1>
+
+        {% if user.reservations %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Movie</th>
+                    <th>Room</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Seat (Row x Column)</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reservation in user.reservations %}
+                <tr>
+                    <td>{{ reservation.schedule.movie.name }}</td>
+                    <td>{{ reservation.schedule.room.name }}</td>
+                    <td>{{ reservation.schedule.start_time }}</td>
+                    <td>{{ reservation.schedule.end_time }}</td>
+                    <td>{{ reservation.seat.row_number }} x {{ reservation.seat.column_number }}</td>
+                    <td><button data-reservation-id="{{ reservation.id }}"
+                            class="deleteReservation btn btn-sm btn-danger">Delete</button></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>You have no reservations.</p>
+        {% endif %}
     </div>
 </div>

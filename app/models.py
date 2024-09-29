@@ -18,6 +18,8 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     role = Column(Enum(UserRole), default=UserRole.regular.value)
 
+    reservations = relationship("Reservation", back_populates="user")
+
 
 class Movie(Base):
     __tablename__ = "movies"
@@ -53,16 +55,31 @@ class Seat(Base):
     column_number = Column(Integer, nullable=False)
 
     room = relationship("Room", back_populates="seats")
+    reservations = relationship("Reservation", back_populates="seat")
 
 
 class Schedule(Base):
     __tablename__ = "schedule"
 
     id = Column(Integer, primary_key=True, index=True)
-    movie_id = Column(Integer, ForeignKey("movies.id", ondelete="CASCADE"))
-    room_id = Column(Integer, ForeignKey("rooms.id", ondelete="CASCADE"))
+    movie_id = Column(Integer, ForeignKey("movies.id", ondelete="CASCADE"), nullable=False)
+    room_id = Column(Integer, ForeignKey("rooms.id", ondelete="CASCADE"), nullable=False)
     start_time = Column(DateTime, nullable=False)
     end_time = Column(DateTime, nullable=False)
 
     movie = relationship("Movie", back_populates="schedules")
     room = relationship("Room", back_populates="schedules")
+    reservations = relationship("Reservation", back_populates="schedule")
+
+
+class Reservation(Base):
+    __tablename__ = "reservations"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    schedule_id = Column(Integer, ForeignKey("schedule.id"), nullable=False)
+    seat_id = Column(Integer, ForeignKey("seats.id"), nullable=False)
+
+    user = relationship("User", back_populates="reservations")
+    schedule = relationship("Schedule", back_populates="reservations")
+    seat = relationship("Seat", back_populates="reservations")

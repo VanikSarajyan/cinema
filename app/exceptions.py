@@ -16,3 +16,15 @@ class InvalidScheduleException(Exception):
 
 class ScheduleNotFoundException(Exception):
     pass
+
+
+class ReservationNotFoundException(Exception):
+    pass
+
+
+class ReservationAlreadyExistsException(Exception):
+    pass
+
+
+class SeatNotFoundException(Exception):
+    pass

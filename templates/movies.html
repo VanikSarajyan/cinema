@@ -10,6 +10,7 @@
         </div>
         {% endif %}
 
+        <p>Click on the movie to see available schedule</p>
 
         <table class="table table-striped">
             <thead>
@@ -51,7 +52,10 @@
                                 {% for schedule in movie.schedules %}
                                 <li><strong>Room:</strong> {{ schedule.room_id }} |
                                     <strong>Start Time:</strong> {{ schedule.start_time }} |
-                                    <strong>End Time:</strong> {{ schedule.end_time }}
+                                    <strong>End Time:</strong> {{ schedule.end_time }} |
+
+                                    <a href="/reservations/reserve/{{ schedule.id }}"
+                                        class=" reserve btn btn-sm btn-success">Reserve</a> |
 
                                     {% if user.role == 'admin' %}
                                     <a href="/schedules/{{ schedule.id }}/edit" class="btn btn-sm btn-primary">Edit</a>
@@ -60,6 +64,7 @@
                                         class="deleteSchedule btn btn-sm btn-danger">Delete</button>
                                     {% endif %}
                                 </li>
+                                <hr>
                                 {% endfor %}
                             </ul>
                             {% else %}

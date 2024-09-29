@@ -16,6 +16,9 @@ class ScheduleService:
     def get_all_schedules(self) -> list[Schedule]:
         return self._db.query(Schedule).all()
 
+    def get_schedule_by_id(self, schedule_id: int) -> Schedule | None:
+        return self._db.query(Schedule).filter(Schedule.id == schedule_id).first()
+
     def create_schedule(self, schedule_data: ScheduleCreate) -> Schedule:
         if not self._room_service.is_room_available(
             schedule_data.room_id,
@@ -54,6 +57,9 @@ class ScheduleService:
         max_duration = timedelta(minutes=(round(movie_duration_minutes / 10) * 10) + 10)
 
         min_duration = timedelta(minutes=movie_duration_minutes)
+
+        if time_diff < timedelta(0):
+            raise InvalidScheduleException("End date and time can't be before start date and time")
 
         if time_diff < min_duration:
             raise InvalidScheduleException(

@@ -11,6 +11,9 @@ class RoomService:
     def get_alls_rooms(self) -> list[Room]:
         return self._db.query(Room).all()
 
+    def get_room_by_id(self, room_id: int) -> Room | None:
+        return self._db.query(Room).filter(Room.id == room_id).first()
+
     def is_room_available(self, room_id: int, start_time: datetime, end_time: datetime) -> bool:
         """
         Check if the room is available between start_time and end_time.
