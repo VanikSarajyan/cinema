@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel, EmailStr, Field
 
 
@@ -26,3 +27,10 @@ class MovieCreate(MovieBase):
 
 class MovieUpdate(MovieBase):
     active: bool = True
+
+
+class ScheduleCreate(BaseModel):
+    movie_id: int
+    room_id: int
+    start_time: datetime
+    end_time: datetime

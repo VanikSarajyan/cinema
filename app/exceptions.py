@@ -1,7 +1,3 @@
-from starlette import status
-from fastapi import HTTPException
-
-
 class UserNotFoundException(Exception):
     pass
 
@@ -11,4 +7,8 @@ class PasswordMismatchException(Exception):
 
 
 class MovieNotFoundException(Exception):
+    pass
+
+
+class InvalidScheduleException(Exception):
     pass

@@ -10,7 +10,7 @@ class MovieService:
         self._db = db
         self._model = Movie
 
-    def get_movies(self, only_actives: bool = True) -> list[Movie]:
+    def get_all_movies(self, only_actives: bool = True) -> list[Movie]:
         if only_actives:
             return self._db.query(Movie).filter(Movie.active).all()
         return self._db.query(Movie).all()

@@ -19,7 +19,7 @@ movies_router = APIRouter(prefix="/movies", tags=["Movies"])
 @movies_router.get("/")
 def get_movies(db: Session = Depends(get_db)):
     movie_servie = MovieService(db)
-    return movie_servie.get_movies()
+    return movie_servie.get_all_movies()
 
 
 @movies_router.get("/movies-page")
@@ -30,7 +30,7 @@ def render_movies_page(
         return redirect_to_login()
 
     movie_servie = MovieService(db)
-    movies = movie_servie.get_movies(only_actives=user.role != UserRole.admin)
+    movies = movie_servie.get_all_movies(only_actives=user.role != UserRole.admin)
     return templates.TemplateResponse("movies.html", {"request": request, "movies": movies, "user": user})
 
 
