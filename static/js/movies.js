@@ -109,3 +109,16 @@ for (let i = 0; i < deleteMovieButtons.length; i++) {
         }
     });
 }
+
+document.querySelectorAll('.movieRow').forEach(row => {
+    row.addEventListener('click', function () {
+        const movieId = this.getAttribute('data-movie-id');
+        const scheduleRow = document.getElementById(`schedule-${movieId}`);
+
+        if (scheduleRow.style.display === "none") {
+            scheduleRow.style.display = "table-row";
+        } else {
+            scheduleRow.style.display = "none";
+        }
+    });
+});

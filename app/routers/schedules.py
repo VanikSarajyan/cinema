@@ -5,7 +5,7 @@ from fastapi.responses import HTMLResponse
 from starlette import status
 from sqlalchemy.orm import Session
 
-from app.exceptions import InvalidScheduleException
+from app.exceptions import InvalidScheduleException, ScheduleNotFoundException
 from app.template import templates
 from app.schemas import ScheduleCreate
 from app.services import ScheduleService, RoomService, MovieService
@@ -59,3 +59,16 @@ def create_schedule(
     except InvalidScheduleException as e:
         logging.error(e)
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+
+@schdeules_router.delete("/{schedule_id}")
+def delete_schedule(
+    schedule_id: int,
+    db: Annotated[Session, Depends(get_db)],
+):
+    schedule_service = ScheduleService(db, RoomService(db))
+    try:
+        schedule_service.delete_schedule(schedule_id)
+    except ScheduleNotFoundException as e:
+        logging.error(e)
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Schedule Not Found")

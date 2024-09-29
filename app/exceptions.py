@@ -12,3 +12,7 @@ class MovieNotFoundException(Exception):
 
 class InvalidScheduleException(Exception):
     pass
+
+
+class ScheduleNotFoundException(Exception):
+    pass

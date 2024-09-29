@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.models import Schedule
 from app.services import RoomService, MovieService
 from app.schemas import ScheduleCreate
-from app.exceptions import InvalidScheduleException
+from app.exceptions import InvalidScheduleException, ScheduleNotFoundException
 
 
 class ScheduleService:
@@ -46,7 +46,8 @@ class ScheduleService:
         """
         Validate that the schedule time is appropriate for the movie duration.
         - The schedule duration must be at least the movie duration.
-        - The schedule duration must not exceed the movie duration by more than 10 minutes, rounded to the nearest 10 minutes.
+        - The schedule duration must not exceed the movie duration by more than 10 min,
+        rounded to the nearest 10 minutes.
         """
         time_diff = end_time - start_time
 
@@ -61,11 +62,21 @@ class ScheduleService:
 
         if time_diff > max_duration:
             raise InvalidScheduleException(
-                f"The schedule time is too long. It should not exceed {movie_duration_minutes} minutes by more than 10 minutes.",
+                f"The schedule time is too long. It should not exceed {movie_duration_minutes} minutes"
+                "by more than 10 minutes.",
             )
 
     def get_schedules_by_movie_id(self, movie_id: int) -> list[Schedule]:
-        return self.db.query(Schedule).filter(Schedule.movie_id == movie_id).all()
+        return self._db.query(Schedule).filter(Schedule.movie_id == movie_id).all()
 
     def get_schedules_by_room_id(self, room_id: int) -> list[Schedule]:
-        return self.db.query(Schedule).filter(Schedule.room_id == room_id).all()
+        return self._db.query(Schedule).filter(Schedule.room_id == room_id).all()
+
+    def delete_schedule(self, schedule_id: int) -> None:
+        schedule = self._db.query(Schedule).filter(Schedule.id == schedule_id).first()
+
+        if not schedule:
+            raise ScheduleNotFoundException("Schedule not found")
+
+        self._db.delete(schedule)
+        self._db.commit()

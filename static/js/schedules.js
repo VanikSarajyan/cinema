@@ -39,3 +39,31 @@ if (createScheduleForm) {
         }
     });
 }
+
+
+document.querySelectorAll('.deleteSchedule').forEach(button => {
+    button.addEventListener('click', async function (event) {
+        event.stopPropagation();
+
+        const scheduleId = this.getAttribute('data-schedule-id');
+        const confirmed = confirm("Are you sure you want to delete this schedule?");
+
+
+        if (confirmed) {
+            try {
+                const response = await fetch(`/schedules/${scheduleId}`, {
+                    method: 'DELETE',
+                });
+
+                if (response.ok) {
+                    window.location.reload();
+                } else {
+                    alert('Failed to delete the schedule. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while deleting the schedule.');
+            }
+        }
+    });
+});

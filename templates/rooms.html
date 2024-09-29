@@ -6,7 +6,7 @@
 
         {% if user.role == 'admin' %}
         <div class="mb-3">
-            <a href="/rooms/room-create" class="btn btn-primary">Create Room</a>
+            <a href="/rooms/room-create" class="btn btn-success">Create Room</a>
         </div>
         {% endif %}
 
@@ -35,10 +35,40 @@
                     </td>
                     {% if user.role == 'admin' %}
                     <td>
-                        <a href="/rooms/{{ room.id }}/edit" class="btn btn-sm btn-warning">Edit</a>
+                        <a href="/rooms/{{ room.id }}/edit" class="btn btn-sm btn-primary">Edit</a>
                         <button data-room-id="{{ room.id }}" class="deleteroom btn btn-sm btn-danger">Delete</a>
                     </td>
                     {% endif %}
+                </tr>
+                <tr class="scheduleRow" id="schedule-{{ room.id }}" style="display:none;">
+                    <td colspan="4">
+                        <div id="schedules-list-{{ room.id }}" class="schedules-list">
+                            <h5>Schedules for {{ room.name }}:</h5>
+                            {% if room.schedules %}
+                            <ul>
+                                {% for schedule in room.schedules %}
+                                <li>
+                                    <strong>Movie:</strong> {{ schedule.movie.name }} |
+                                    <strong>Start Time:</strong> {{ schedule.start_time }} |
+                                    <strong>End Time:</strong> {{ schedule.end_time }}
+
+                                    {% if user.role == 'admin' %}
+                                    <a href="/schedules/{{ schedule.id }}/edit" class="btn btn-sm btn-primary">Edit</a>
+                                    |
+                                    <button data-schedule-id="{{ schedule.id }}"
+                                        class="deleteSchedule btn btn-sm btn-danger">Delete</button>
+                                    {% endif %}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            {% else %}
+                            <p>No schedules available for this room.</p>
+                            {% endif %}
+                            {% if user and user.role == 'admin' %}
+                            <a class="btn btn-success" href="/schedules/create-page">Create Schedule</a>
+                            {% endif %}
+                        </div>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
